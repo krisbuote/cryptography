@@ -4,9 +4,11 @@ import string
 ''' Plaintext is shifted an int. See "substitution cipher" on wikipedia. '''
 ''' Author: Kristopher Buote '''
 
-def buildCoder(shift):
+def buildCoders(shift):
     assert shift >=0 and shift <=26
-    coder = dict()
+    encoder = dict()
+    decoder = dict()
+    
     alpha_lower = string.ascii_lowercase
     alpha_upper = string.ascii_uppercase
     alpha_length = len(alpha_lower)
@@ -21,33 +23,42 @@ def buildCoder(shift):
         char_upper = alpha_upper[i]
         char_upper_shifted = alpha_upper[i+shift]
 
-        coder[char_lower] = char_lower_shifted
-        coder[char_upper] = char_upper_shifted
+        # Build the encoder
+        encoder[char_lower] = char_lower_shifted
+        encoder[char_upper] = char_upper_shifted
 
-    return coder
+        # Build the decoder
+        decoder[char_lower_shifted] = char_lower
+        decoder[char_upper_shifted] = char_upper
 
-def applyCoder(plaintext, coder):
+        
+    return encoder, decoder
+
+
+
+def applyCoder(text, coder):
 
     # alphabetic characters are ciphered, punctation remains constant
-    ciphertext = []
+    transformed_text = []
 
-    for char in plaintext:
+    for char in text:
         if char in coder:
-            cipherChar = coder[char]
-            ciphertext.append(cipherChar)
+            newChar = coder[char]
+            transformed_text.append(newChar)
         else:
-            ciphertext.append(char)
+            transformed_text.append(char)
 
     # Return the joined list of characters to return a single string of cipher text.
-    return ''.join(ciphertext)
+    return ''.join(transformed_text)
 
 
 # Here's an example
-myCoder = buildCoder(shift=17)
-text = 'Hello, World!'
-ciphertext = applyCoder(plaintext=text, coder=myCoder)
-print(ciphertext)
+myEncoder, myDecoder = buildCoders(shift=17)
+sample_text = 'Hello, World!'
+ciphertext = applyCoder(text=sample_text, coder=myEncoder)
+plaintext = applyCoder(text=ciphertext, coder=myDecoder)
+print('Ciphertext: {0} \nPlaintext: {1}\n'.format(ciphertext, plaintext))
 
 # Input your own plain text and receive the ciphertext!
 inpText = input('Input your plaintext: ')
-print(applyCoder(inpText,myCoder))
+print('Your ciphertext: ', applyCoder(inpText,myEncoder))
